@@ -6,10 +6,11 @@ fun main() {
     rabbits[0] = 1uL
 
     for (n in 1..N - 1) {
-        val newRabbits = rabbits.sum() - rabbits[0]
+        var newRabbits = 0uL
 
         // right shift for array
         for (i in M - 1 downTo 1) {
+            newRabbits += rabbits[i]
             rabbits[i] = rabbits[i - 1]
         }
 
