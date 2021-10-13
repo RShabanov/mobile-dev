@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Guess Number Game</string>
+    <string name="set_bounds_text">SET BOUNDS</string>
+    <string name="upper_bound">MAX</string>
+    <string name="lower_bound">MIN</string>
+    <string name="play_btn">LET\'S PLAY</string>
+    <string name="text">Your number is more than</string>
+    <string name="warning_text">Bounds are supposed to be [MIN; MAX]</string>
+    <string name="guess_number">Your number is</string>
+    <string name="guess_range">Your number is more than</string>
+    <string name="restart">restart</string>
+
+</resources>
