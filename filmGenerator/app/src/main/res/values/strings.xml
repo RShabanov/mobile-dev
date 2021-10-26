@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">filmGenerator</string>
+    <string name="random_movie_btn">Get random movie</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="movie_director">Director:</string>
+    <string name="release_date">Release date:</string>
+    <string name="movie_genres">Genres:</string>
+    <string name="running_time">Running time:</string>
+    <string name="actors">Actors:</string>
+    <string name="generate_a_movie">Generate a movie</string>
+    <string name="no_film_left">No movie left</string>
+    <string name="reset">Reset</string>
+</resources>
