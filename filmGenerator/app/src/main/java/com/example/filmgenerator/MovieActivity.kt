@@ -1,5 +1,6 @@
 package com.example.filmgenerator
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -18,6 +19,7 @@ class MovieActivity : AppCompatActivity() {
     lateinit var moviesData: Movies
     private var movieIndex2Show: Int = 0
     private var proposedMovieNumber: Int = 0
+    lateinit var showedMovies: MutableList<UByte>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +30,34 @@ class MovieActivity : AppCompatActivity() {
                 onGetRandomMovie()
             }
 
+        loadData()
+        onGetRandomMovie()
+    }
+
+    private fun loadData() {
         val moviesStream = resources.openRawResource(R.raw.movies)
         val gson = Gson()
         moviesData = gson.fromJson(InputStreamReader(moviesStream), Movies::class.java)
 
-        onGetRandomMovie()
+        val pref = getPreferences(Context.MODE_PRIVATE)
+        showedMovies = pref.getString("showedMovies", "")?.splitToSequence(",")?.filter { it.isNotEmpty() }?.map { it.toUByte() }?.toMutableList()!!
+        Log.d("showedMovies", showedMovies.joinToString(", "))
+
+        if (showedMovies.size < moviesData.movies.size) {
+            for (idx in showedMovies) {
+                val lastMovieIndex = moviesData.movies.size - proposedMovieNumber - 1
+
+                val movieIndex2Change = moviesData.movies.indexOfFirst { it.info.rank == idx }
+                moviesData.movies[movieIndex2Change] = moviesData.movies[lastMovieIndex]
+                    .also { moviesData.movies[lastMovieIndex] = moviesData.movies[movieIndex2Change] }
+
+                proposedMovieNumber += 1
+            }
+        } else {
+            showedMovies.clear()
+        }
     }
+
 
     private fun updateMovie() {
         val movieImage = findViewById<ImageView>(R.id.movie_img)
@@ -131,10 +155,18 @@ class MovieActivity : AppCompatActivity() {
 
         movieIndex2Show = (0..lastMovieIndex).random()
         updateMovie()
+        // add showed movie
+        showedMovies.add(moviesData.movies[movieIndex2Show].info.rank)
 
         moviesData.movies[lastMovieIndex] = moviesData.movies[movieIndex2Show]
             .also { moviesData.movies[movieIndex2Show] = moviesData.movies[lastMovieIndex] }
 
         proposedMovieNumber += 1
+
+        val pref = getPreferences(Context.MODE_PRIVATE)
+        val editor = pref.edit()
+
+        editor.putString("showedMovies", showedMovies.joinToString(","))
+        editor.apply()
     }
 }
