@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CityNeiborhood</string>
+    <string name="city_radius">City radius (m)</string>
+    <string name="neighbors_btn">Show neighbors</string>
+</resources>
