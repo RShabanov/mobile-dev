@@ -7,10 +7,11 @@ import android.graphics.Paint
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import kotlin.random.Random
 
 class ColorGame(context: Context?) : View(context) {
-    private val N = 4
+    private val N = 2
     private val tiles = Array(N) { BooleanArray(N) { Random.nextBoolean() } }
     private val tileSize = 200f;
     private val gap = 30; // gap between tiles
@@ -44,7 +45,11 @@ class ColorGame(context: Context?) : View(context) {
             won = cnt == 0 || cnt == N * N;
 
             if (won) {
+                val text = "Great job!"
+                val duration = Toast.LENGTH_SHORT
 
+                val toast = Toast.makeText(context, text, duration)
+                toast.show()
             }
         }
     }
