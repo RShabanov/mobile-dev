@@ -10,16 +10,14 @@ import android.view.View
 import kotlin.random.Random
 
 class ColorGame(context: Context?) : View(context) {
-    val p = Paint();
-    var centerX = 50f
-    var centerY = 50f
-
-    val tiles = Array(2) { BooleanArray(2) { Random.nextBoolean() } }
-    val tileSize = 200;
-    val margin = 30;
-    var won = false;
+    private val N = 4
+    private val tiles = Array(N) { BooleanArray(N) { Random.nextBoolean() } }
+    private val tileSize = 200f;
+    private val gap = 30; // gap between tiles
+    private var won = false;
 
     override fun onDraw(canvas: Canvas?) {
+        val p = Paint();
 
         p.color = Color.RED
         canvas?.apply {
@@ -27,23 +25,27 @@ class ColorGame(context: Context?) : View(context) {
 
             var cnt = 0
 
-            for (i in 0 until 2) {
-                for (j in 0 until 2) {
+            for (i in 0 until N) {
+                for (j in 0 until N) {
                     p.color = if (tiles[i][j]) Color.WHITE else Color.BLACK;
 
                     cnt += if (tiles[i][j]) 1 else 0;
 
                     drawRoundRect(
-                        j * tileSize + (j + 1f) * margin,
-                        i * tileSize + (i + 1f) * margin,
-                        (j + 1f) * (margin + tileSize),
-                        (i + 1f) * (margin + tileSize),
+                        j * tileSize + (j + 1f) * gap,
+                        i * tileSize + (i + 1f) * gap,
+                        (j + 1f) * (gap + tileSize),
+                        (i + 1f) * (gap + tileSize),
                         20f, 20f, p
                     )
                 }
             }
 
-            won = cnt == 0 || cnt == 4;
+            won = cnt == 0 || cnt == N * N;
+
+            if (won) {
+
+            }
         }
     }
 
@@ -53,35 +55,40 @@ class ColorGame(context: Context?) : View(context) {
 
         event?.apply {
             if (action != MotionEvent.ACTION_DOWN) return false;
-            var touchedRect: Int? = null;
+            var touchedRectX: Int? = null;
+            var touchedRectY: Int? = null;
 
-            for (i in 0 until 2) {
-                for (j in 0 until 2) {
-                    val left = j * tileSize + (j + 1f) * margin
-                    val right = (j + 1f) * (margin + tileSize)
-                    val top = i * tileSize + (i + 1f) * margin
-                    val bottom = (i + 1f) * (margin + tileSize)
+            for (i in 0 until N) {
+                for (j in 0 until N) {
+                    val left = j * tileSize + (j + 1f) * gap
+                    val right = (j + 1f) * (gap + tileSize)
+                    val top = i * tileSize + (i + 1f) * gap
+                    val bottom = (i + 1f) * (gap + tileSize)
 
                     if (x >= left && x <= right &&
                         y >= top && y <= bottom
                     ) {
-                        touchedRect = i * 2 + j
+                        touchedRectY = i
+                        touchedRectX = j
                         break
                     }
                 }
             }
 
-            if (touchedRect != null) {
-                for (i in 0 until 2) {
-                    for (j in 0 until 2) {
-                        if (3 - touchedRect != (i * 2 + j)) {
-                            tiles[i][j] = !tiles[i][j]
-                        }
-                    }
-                }
+            if (touchedRectX != null && touchedRectY != null) {
+                invertColors(touchedRectY, touchedRectX)
             }
             invalidate()
         }
         return true
+    }
+
+    private fun invertColors(y: Int, x: Int) {
+        for (i in 0 until N) {
+            tiles[y][i] = !tiles[y][i]
+            tiles[i][x] = !tiles[i][x]
+        }
+
+        tiles[y][x] = !tiles[y][x]
     }
 }
