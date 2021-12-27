@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         val layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT)
         layoutParams.weight = 1f
 
-        val colorListener = View.OnClickListener() {
+        val onClickListener = View.OnClickListener() {
             when (previousCard) {
                 null -> {
                     if (it.isClickable) {
@@ -71,12 +71,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         cards = getCards(
-            pairsNumber,
-            layoutParams,
-            colorListener
+            numberOfPairs = pairsNumber,
+            params = layoutParams,
+            onClickListener = onClickListener,
+            shuffle = true
         )
-
-//        cards.shuffle() // breaks onClickListener
 
         fillLayoutWithCards(layout, cards, rowNumber)
 
@@ -120,7 +119,8 @@ class MainActivity : AppCompatActivity() {
     private fun getCards(
         numberOfPairs: Int,
         params: LinearLayout.LayoutParams,
-        onClickListener: View.OnClickListener
+        onClickListener: View.OnClickListener,
+        shuffle: Boolean = true
     ): ArrayList<ImageView> {
         val cards = ArrayList<ImageView>()
         val tags = cardsResources.keys.toList()
@@ -133,13 +133,15 @@ class MainActivity : AppCompatActivity() {
                         layoutParams = params
                         setOnClickListener(onClickListener)
                         tag = tags[pairNumber]
-                        id = pairNumber * 2 + i
                     }
 
                 cards.add(card)
                 faceCardDown(card)
             }
         }
+
+        cards.shuffle()
+        cards.forEachIndexed { index, it -> it.id = index }
 
         return cards
     }
