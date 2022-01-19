@@ -1,5 +1,6 @@
 package com.example.colorgame
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -11,33 +12,33 @@ import android.widget.Toast
 import kotlin.random.Random
 
 class ColorGame(context: Context?) : View(context) {
-    private val N = 2
+    private val N = 4
     private val tiles = Array(N) { BooleanArray(N) { Random.nextBoolean() } }
-    private val tileSize = 200f;
-    private val gap = 30; // gap between tiles
+    private val radius = 100f;
+    private val gap = 30f; // gap between tiles
     private var won = false;
 
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         val p = Paint();
 
         p.color = Color.RED
         canvas?.apply {
-            drawColor(resources.getColor(R.color.cardview_dark_background))
+            drawColor(Color.parseColor("#F2F3AE"))
 
             var cnt = 0
 
             for (i in 0 until N) {
                 for (j in 0 until N) {
-                    p.color = if (tiles[i][j]) Color.WHITE else Color.BLACK;
+                    p.color = if (tiles[i][j]) Color.parseColor("#FF521B") else Color.parseColor("#020122")
 
                     cnt += if (tiles[i][j]) 1 else 0;
 
-                    drawRoundRect(
-                        j * tileSize + (j + 1f) * gap,
-                        i * tileSize + (i + 1f) * gap,
-                        (j + 1f) * (gap + tileSize),
-                        (i + 1f) * (gap + tileSize),
-                        20f, 20f, p
+                    drawCircle(
+                        j * radius * 2f + (j + 1f) * gap + radius,
+                        i * radius * 2f + (i + 1f) * gap + radius,
+                        radius,
+                        p
                     )
                 }
             }
@@ -54,34 +55,34 @@ class ColorGame(context: Context?) : View(context) {
         }
     }
 
+    private fun distanceSquared(x1: Float, y1: Float, x2: Float, y2: Float): Float {
+        return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2)
+    }
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        Log.d("Touched point", "(${event?.rawX}; ${event?.rawY})")
         if (won) return false;
 
         event?.apply {
             if (action != MotionEvent.ACTION_DOWN) return false;
-            var touchedRectX: Int? = null;
-            var touchedRectY: Int? = null;
+            var touchedX: Int? = null;
+            var touchedY: Int? = null;
 
             for (i in 0 until N) {
                 for (j in 0 until N) {
-                    val left = j * tileSize + (j + 1f) * gap
-                    val right = (j + 1f) * (gap + tileSize)
-                    val top = i * tileSize + (i + 1f) * gap
-                    val bottom = (i + 1f) * (gap + tileSize)
+                    val cx = j * radius * 2f + (j + 1f) * gap + radius
+                    val cy = i * radius * 2f + (i + 1f) * gap + radius
+                    val dist = distanceSquared(cx, cy, x, y)
 
-                    if (x >= left && x <= right &&
-                        y >= top && y <= bottom
-                    ) {
-                        touchedRectY = i
-                        touchedRectX = j
+                    if (dist <= radius * radius) {
+                        touchedY = i
+                        touchedX = j
                         break
                     }
                 }
             }
 
-            if (touchedRectX != null && touchedRectY != null) {
-                invertColors(touchedRectY, touchedRectX)
+            if (touchedX != null && touchedY != null) {
+                invertColors(touchedY, touchedX)
             }
             invalidate()
         }
